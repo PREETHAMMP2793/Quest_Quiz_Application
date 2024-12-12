@@ -1,0 +1,25 @@
+# Core Dependencies
+Bootstrap - 5.3.3          # CSS framework for responsive design
+React-Bootstrap - 2.10.6    # React components built using Bootstrap
+React-Icons - 5.4.0        # Library of popular icons for React
+
+# State Management
+Redux - 5.0.1              # State management library
+React-Redux - 9.2.0        # Official Redux bindings for React
+@Reduxjs/Toolkit - 2.5.0   # Toolkit for simplifying Redux development
+
+# Animations
+Framer Motion - 11.13.5      # Animation library for React
+
+# Notifications
+React-Toastify - 10.0.6     # Toast notifications for React applications
+
+# HTTP Requests
+Axios - 1.7.9              # HTTP client for making API requests
+
+# Data Visualization
+React-Chartjs-2 - 5.2.0    # React wrapper for Chart.js for creating interactive charts
+
+# Routing
+React-Router-Dom - 6.15.0  # React routing for browser-based applications
+React-Router - 6.15.0      # Core routing library for React
