@@ -3,6 +3,9 @@ const cors = require('cors');
 const dotenv = require('dotenv');
 const connectDB = require('./config/db');
 
+const UserRoutes = require('./routes/UserRoute');
+const ResultRoutes = require('./routes/ResultRoute');
+
 dotenv.config();
 
 const app = express();
@@ -24,7 +27,8 @@ app.get('/', (req, res) => {
 });
 
 // Use test routes
-
+app.use('/api/users', UserRoutes);
+app.use('/api/results', ResultRoutes);
 
 // Start server
 const PORT = process.env.PORT || 5000;

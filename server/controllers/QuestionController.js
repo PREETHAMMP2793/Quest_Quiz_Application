@@ -1,7 +1,7 @@
 const Question = require('../models/Question');
 
 // CREATE: Add a new question
-exports.createQuestion = async (req, res) => {
+const createQuestion = async (req, res) => {
     try {
         const { questionId, jobAppliedFor, category, question, options, correctOption, image } = req.body;
 
@@ -25,7 +25,7 @@ exports.createQuestion = async (req, res) => {
 };
 
 // EDIT: Update a question by ID
-exports.editQuestion = async (req, res) => {
+const editQuestion = async (req, res) => {
     try {
         const { questionId } = req.params;
         const { jobAppliedFor, category, question, options, correctOption, image } = req.body;
@@ -55,7 +55,7 @@ exports.editQuestion = async (req, res) => {
 };
 
 // DELETE: Delete a question by ID
-exports.deleteQuestion = async (req, res) => {
+const deleteQuestion = async (req, res) => {
     try {
         const { questionId } = req.params;
 
@@ -73,7 +73,7 @@ exports.deleteQuestion = async (req, res) => {
 };
 
 // READ: Get questions by category
-exports.getQuestionByCategory = async (req, res) => {
+const getQuestionByCategory = async (req, res) => {
     try {
         const { category } = req.params;
         const questions = await Question.find({ category });
@@ -90,7 +90,7 @@ exports.getQuestionByCategory = async (req, res) => {
 };
 
 // READ: Get questions by job applied for
-exports.getQuestionByJob = async (req, res) => {
+const getQuestionByJob = async (req, res) => {
     try {
         const { jobAppliedFor } = req.params;
         const questions = await Question.find({ jobAppliedFor });
@@ -107,7 +107,7 @@ exports.getQuestionByJob = async (req, res) => {
 };
 
 // READ: Get all questions
-exports.getAllQuestions = async (req, res) => {
+const getAllQuestions = async (req, res) => {
     try {
         const questions = await Question.find();
         res.status(200).json(questions);
@@ -116,3 +116,5 @@ exports.getAllQuestions = async (req, res) => {
         res.status(500).json({ message: "Error retrieving questions", error });
     }
 };
+
+module.exports = { createQuestion, editQuestion, deleteQuestion, getQuestionByCategory, getQuestionByJob, getAllQuestions};
