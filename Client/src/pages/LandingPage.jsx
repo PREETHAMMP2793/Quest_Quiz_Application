@@ -2,7 +2,7 @@ import Landing from "../components/Landing/Landing"
 
 function LandingPage() {
   return (
-    <div>LandingPage
+    <div>
         <Landing/>
     </div>
   )
