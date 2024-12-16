@@ -1,8 +1,25 @@
 /* eslint-disable no-unused-vars */
 import { useState } from "react";
 import { Line } from "react-chartjs-2";
+import {
+  Container,
+  Row,
+  Col,
+  Card,
+  Table,
+  Form,
+} from "react-bootstrap";
 import "bootstrap/dist/css/bootstrap.min.css";
-import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend } from "chart.js";
+import {
+  Chart as ChartJS,
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  Title,
+  Tooltip,
+  Legend,
+} from "chart.js";
 
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend);
 
@@ -40,81 +57,95 @@ const AdminDashboard = () => {
   );
 
   return (
-    <div className="container mt-4">
-  {/* Title */}
-  <h1 className="text-center mb-4 fw-light">ADMIN DASHBOARD</h1>
+    <Container className="Cls_Container_AdminDashboard mt-4">
+      {/* Title */}
+      <h1 className="Cls_H1_Title text-center mb-4 fw-light">ADMIN DASHBOARD</h1>
 
-  {/* Top row */}
-  <div className="row mb-4">
-    {/* Total attendees */}
-    <div className="col-md-6">
-      <div className="card text-center mb-3">
-        <div className="card-body">
-          <h5 className="card-title">Total Attendees</h5>
-          <p className="card-text display-4 fw-light">150</p> {/* Replace 150 with dynamic data */}
-        </div>
-      </div>
-      {/* New Total Registered container */}
-      <div className="card text-center">
-        <div className="card-body">
-          <h5 className="card-title">Total Number of Registered</h5>
-          <p className="card-text display-4 fw-light">200</p> {/* Replace 200 with dynamic data */}
-        </div>
-      </div>
-    </div>
+      {/* Top row */}
+      <Row className="Cls_Row_TopRow mb-4">
+        {/* Total attendees */}
+        <Col md={6} className="Cls_Col_TotalAttendees">
+          <Card className="Cls_Card_Attendees text-center mb-3">
+            <Card.Body>
+              <Card.Title className="Cls_CardTitle_TotalAttendees">
+                Total Attendees
+              </Card.Title>
+              <Card.Text className="Cls_CardText_TotalAttendees display-4 fw-light">
+                150 {/* Replace 150 with dynamic data */}
+              </Card.Text>
+            </Card.Body>
+          </Card>
 
-    {/* Line chart */}
-    <div className="col-md-6">
-      <div className="card">
-        <div className="card-body">
-          <h5 className="card-title">Attendees Over the Week</h5>
-          <Line data={attendeesData} />
-        </div>
-      </div>
-    </div>
-  </div>
+          {/* Total Registered */}
+          <Card className="Cls_Card_TotalRegistered text-center">
+            <Card.Body>
+              <Card.Title className="Cls_CardTitle_TotalRegistered">
+                Total Number of Registered
+              </Card.Title>
+              <Card.Text className="Cls_CardText_TotalRegistered display-4 fw-light">
+                200 {/* Replace 200 with dynamic data */}
+              </Card.Text>
+            </Card.Body>
+          </Card>
+        </Col>
 
-  {/* Attendees list */}
-  <div className="card">
-    <div className="card-body">
-      <h5 className="card-title">Attendees List</h5>
-      {/* Search bar */}
-      <input
-        type="text"
-        className="form-control mb-3"
-        placeholder="Search by name or email"
-        value={searchTerm}
-        onChange={(e) => setSearchTerm(e.target.value)}
-      />
-      {/* Attendees table */}
-      <table className="table table-bordered">
-        <thead>
-          <tr>
-            <th>Name</th>
-            <th>Email</th>
-          </tr>
-        </thead>
-        <tbody>
-          {filteredAttendees.length > 0 ? (
-            filteredAttendees.map((attendee, index) => (
-              <tr key={index}>
-                <td>{attendee.name}</td>
-                <td>{attendee.email}</td>
+        {/* Line chart */}
+        <Col md={6} className="Cls_Col_LineChart">
+          <Card className="Cls_Card_LineChart">
+            <Card.Body>
+              <Card.Title className="Cls_CardTitle_LineChart">
+                Attendees Over the Week
+              </Card.Title>
+              <Line data={attendeesData} />
+            </Card.Body>
+          </Card>
+        </Col>
+      </Row>
+
+      {/* Attendees list */}
+      <Card className="Cls_Card_AttendeesList">
+        <Card.Body className="Cls_CardBody_AttendeesList">
+          <Card.Title className="Cls_CardTitle_AttendeesList">
+            Attendees List
+          </Card.Title>
+
+          {/* Search bar */}
+          <Form.Control
+            type="text"
+            placeholder="Search by name or email"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="Cls_FormControl_SearchBar mb-3"
+          />
+
+          {/* Attendees table */}
+          <Table bordered className="Cls_Table_Attendees">
+            <thead className="Cls_Thead_Attendees">
+              <tr>
+                <th className="Cls_Th_Name">Name</th>
+                <th className="Cls_Th_Email">Email</th>
               </tr>
-            ))
-          ) : (
-            <tr>
-              <td colSpan="2" className="text-center">
-                No attendees found
-              </td>
-            </tr>
-          )}
-        </tbody>
-      </table>
-    </div>
-  </div>
-</div>
-
+            </thead>
+            <tbody className="Cls_Tbody_Attendees">
+              {filteredAttendees.length > 0 ? (
+                filteredAttendees.map((attendee, index) => (
+                  <tr key={index} className="Cls_Tr_AttendeeRow">
+                    <td className="Cls_Td_Name">{attendee.name}</td>
+                    <td className="Cls_Td_Email">{attendee.email}</td>
+                  </tr>
+                ))
+              ) : (
+                <tr className="Cls_Tr_NoAttendees">
+                  <td colSpan="2" className="Cls_Td_NoAttendees text-center">
+                    No attendees found
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </Table>
+        </Card.Body>
+      </Card>
+    </Container>
   );
 };
 

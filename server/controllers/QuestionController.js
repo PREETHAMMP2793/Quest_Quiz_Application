@@ -1,4 +1,4 @@
-const Question = require('../models/Question');
+const Question = require('../models/QuestionModel');
 
 // CREATE: Add a new question
 const createQuestion = async (req, res) => {
@@ -79,7 +79,7 @@ const getQuestionByCategory = async (req, res) => {
         const questions = await Question.find({ category });
 
         if (!questions || questions.length === 0) {
-            return res.status(404).json({ message:`No questions found for category: ${category} `});
+            return res.status(404).json({ message: `No questions found for category: ${category}` });
         }
 
         res.status(200).json(questions);
@@ -96,7 +96,7 @@ const getQuestionByJob = async (req, res) => {
         const questions = await Question.find({ jobAppliedFor });
 
         if (!questions || questions.length === 0) {
-            return res.status(404).json({ message: `No questions found for job: ${jobAppliedFor} `});
+            return res.status(404).json({ message: `No questions found for job: ${jobAppliedFor}` });
         }
 
         res.status(200).json(questions);
@@ -117,4 +117,11 @@ const getAllQuestions = async (req, res) => {
     }
 };
 
-module.exports = { createQuestion, editQuestion, deleteQuestion, getQuestionByCategory, getQuestionByJob, getAllQuestions};
+module.exports = {
+    createQuestion,
+    editQuestion,
+    deleteQuestion,
+    getQuestionByCategory,
+    getQuestionByJob,
+    getAllQuestions
+};

@@ -186,7 +186,6 @@ function AdminQuestions() {
               <td>{q.correctOption}</td>
               <td>
                 <Button
-                  variant="warning"
                   onClick={() => {
                     setEditModeQuestion(q);
                     setNewQuestion(q.question);
@@ -194,10 +193,19 @@ function AdminQuestions() {
                     setNewCorrectOption(q.correctOption);
                     setShowEditModal(true);
                   }}
+                  style={{
+                    border: '2px solid #333',  // Dark border
+                    backgroundColor: 'transparent',  // No background color
+                    color: '#333',  // Text color to match the border
+                  }}
                 >
                   Edit
                 </Button>{" "}
-                <Button variant="danger" onClick={() => handleDeleteQuestion(q.id)}>
+                <Button  onClick={() => handleDeleteQuestion(q.id)} style={{
+                    border: '2px solid #333',  // Dark border
+                    backgroundColor: 'transparent',  // No background color
+                    color: '#333',  // Text color to match the border
+                  }}>
                   Delete
                 </Button>
               </td>

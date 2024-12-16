@@ -18,7 +18,7 @@ const addResult = async (req, res) => {
         }
 
         // Generate resultid as a combination of userid and testid
-        const resultid = `${userid}_${testid}`; // Corrected string interpolation
+        const resultid = `${userid}_${testid}`;
 
         // Create a new Result document
         const newResult = new Result({
@@ -37,7 +37,7 @@ const addResult = async (req, res) => {
         res.status(201).json({ message: "Result added successfully.", data: savedResult });
     } catch (error) {
         console.error("Error adding result:", error);
-        res.status(500).json({ message: "An error occurred while adding the result.", error: error.message });
+        res.status(500).json({ message: "An error occurred while adding the result." });
     }
 };
 
@@ -57,11 +57,9 @@ const getResults = async (req, res) => {
         const results = await Result.find(query);
         res.status(200).json(results);
     } catch (error) {
-        console.error("Error fetching results:", error);
         res.status(500).json({ message: "Error fetching results", error: error.message });
     }
 };
-
 // Fetch a single result by resultid
 const getResultById = async (req, res) => {
     try {
@@ -74,7 +72,6 @@ const getResultById = async (req, res) => {
 
         res.status(200).json(result);
     } catch (error) {
-        console.error("Error fetching result:", error);
         res.status(500).json({ message: "Error fetching result", error: error.message });
     }
 };
