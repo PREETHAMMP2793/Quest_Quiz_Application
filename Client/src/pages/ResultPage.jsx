@@ -1,8 +1,11 @@
+import Result from "../components/Result/Result";
 
 function ResultPage() {
   return (
-    <div>ResultPage</div>
-  )
+    <div>
+      <Result />
+    </div>
+  );
 }
 
-export default ResultPage
+export default ResultPage;

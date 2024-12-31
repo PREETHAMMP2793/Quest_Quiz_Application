@@ -1,114 +1,287 @@
-import { useState } from "react";
-import { Form, Button, Alert, Container, Row, Col } from "react-bootstrap";
-import { Link } from "react-router-dom"; // Import Link for navigation
-import "./Candidate.css"; // Import custom styles to match design
+import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { useDispatch } from "react-redux";
+import {
+  setCandidateName,
+  setJobAppliedFor,
+  setCandidateEmail,
+} from "../../../redux/Slices/globalDataSlice";
+import {
+  Card,
+  Button,
+  Form,
+  FormControl,
+  FormGroup,
+  FormLabel,
+  Alert,
+} from "react-bootstrap";
 
 function Candidate() {
-  const [email, setEmail] = useState("");
-  const [jobRole, setJobRole] = useState("");
-  const [error, setError] = useState("");
-  const [loading, setLoading] = useState(false);
+  const [isLogin, setIsLogin] = useState(true);
+  const [formData, setFormData] = useState({
+    candidateName: "",
+    gender: "",
+    email: "",
+    contactNo: "",
+    source: "",
+    qualifications: "",
+    stream: "",
+    yearOfPassing: "",
+    collegename: "",
+    referralcode: "",
+    jobAppliedFor: "",
+  });
+  const [alertMessage, setAlertMessage] = useState(null);
+  const [jobs, setJobs] = useState([]); // State for job options
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
 
-  // Example job roles
-  const jobRoles = [
-    "Software Engineer",
-    "Data Analyst",
-    "Product Manager",
-    "UI/UX Designer",
-    "DevOps Engineer",
-  ];
+  useEffect(() => {
+    // Fetch job titles when the component mounts
+    const fetchJobs = async () => {
+      try {
+        const response = await fetch(
+          "http://localhost:2000/api/questions/jobs"
+        );
+        const data = await response.json();
+        console.log(data);
+        setJobs(data); // Store the fetched jobs in state
+      } catch (error) {
+        console.error("Error fetching jobs:", error);
+        setAlertMessage("Failed to load job titles.");
+      }
+    };
 
-  const handleLogin = (e) => {
-    e.preventDefault(); // Prevent page reload
-    setError("");
-    setLoading(true);
-
-    // Basic validation
-    if (!email || !jobRole) {
-      setError("Please fill in all fields.");
-      setLoading(false);
-      return;
+    if (isLogin) {
+      fetchJobs(); // Only fetch jobs when in login mode
     }
+  }, [isLogin]);
 
-    // Simulated API call for candidate login (replace with actual API call)
-    setTimeout(() => {
-      alert(`Login successful for ${email}. Job applied for: ${jobRole}`);
-      setLoading(false);
-      // Redirect or perform other actions
-    }, 1000);
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData({ ...formData, [name]: value });
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      if (isLogin) {
+        const response = await fetch("http://localhost:2000/api/users/login", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            email: formData.email,
+            jobAppliedFor: formData.jobAppliedFor,
+          }),
+        });
+        const data = await response.json();
+        console.log(data.user.candidateName);
+
+        if (response.ok) {
+          setAlertMessage("Login successful.");
+          dispatch(setCandidateName(data.user.candidateName));
+          dispatch(setCandidateEmail(formData.email));
+          dispatch(setJobAppliedFor(formData.jobAppliedFor));
+          navigate("/testpage");
+        } else {
+          setAlertMessage(`Error: ${data.message}`);
+        }
+      } else {
+        const response = await fetch(
+          "http://localhost:2000/api/users/register",
+          {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(formData),
+          }
+        );
+        const data = await response.json();
+        if (response.ok) {
+          setFormData({ ...formData, payment: false });
+          setAlertMessage("Registration successful.");
+          dispatch(setCandidateName(formData.candidateName));
+          dispatch(setCandidateEmail(formData.email));
+          dispatch(setJobAppliedFor(formData.jobAppliedFor));
+          setIsLogin(true);
+        } else {
+          alert(`Error: ${data.message}`);
+        }
+      }
+    } catch (error) {
+      setAlertMessage(`Server error. Please try again later.${error}`);
+    }
   };
 
   return (
-    <div id="welcome">
-      <Container className="mt-5">
-        <Row className="justify-content-center">
-          <Col xs={12} md={6} className="login-form-container">
-            <h2 className="text-center mb-4">Candidate Login</h2>
-
-            {error && <Alert variant="danger">{error}</Alert>}
-
-            <Form onSubmit={handleLogin} className="custom-form">
-              {/* Email Field */}
-              <Form.Group className="mb-3" controlId="formEmail">
-                <Form.Label>Email address</Form.Label>
-                <Form.Control
-                  type="email"
-                  placeholder="Enter email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  className="custom-input"
+    <div>
+      <Card className="m-3">
+        <Form onSubmit={handleSubmit}>
+          <h3 className="text-center my-3">{isLogin ? "Login" : "Register"}</h3>
+          {alertMessage && <Alert variant="info">{alertMessage}</Alert>}
+          {!isLogin && (
+            <>
+              <FormGroup>
+                <FormLabel>Candidate Name</FormLabel>
+                <FormControl
+                  type="text"
+                  name="candidateName"
+                  value={formData.candidateName}
+                  onChange={handleChange}
+                  required
                 />
-                <div className="line"></div>
-              </Form.Group>
-
-              {/* Job Role Dropdown */}
-              <Form.Group className="mb-3" controlId="formJobRole">
-                <Form.Label>Job Applied For</Form.Label>
-                <Form.Select
-                  value={jobRole}
-                  onChange={(e) => setJobRole(e.target.value)}
-                  className="custom-select"
+              </FormGroup>
+              <FormGroup>
+                <FormLabel>Email</FormLabel>
+                <FormControl
+                  type="email"
+                  name="email"
+                  value={formData.email}
+                  onChange={handleChange}
+                  required
+                />
+              </FormGroup>
+              <FormGroup>
+                <FormLabel>Gender</FormLabel>
+                <FormControl
+                  as="select"
+                  name="gender"
+                  value={formData.gender}
+                  onChange={handleChange}
+                  required
                 >
-                  <option value="">Select a job role</option>
-                  {jobRoles.map((role, index) => (
-                    <option key={index} value={role}>
-                      {role}
-                    </option>
-                  ))}
-                </Form.Select>
-                <div className="line"></div>
-              </Form.Group>
-
-              {/* Submit Button */}
-              <Button
-                variant="primary"
-                type="submit"
-                disabled={loading}
-                className="w-100 custom-button"
-              >
-                {loading ? "Logging in..." : "Login"}
-              </Button>
-            </Form>
-
-            {/* Registration Link */}
-            <div className="mt-3 text-center">
-              <p>
-                Not registered? <Link to="/register">Register here</Link>
-              </p>
-            </div>
-          </Col>
-        </Row>
-      </Container>
-
-      {/* SVG Animation */}
-      <svg
-        className="background-svg"
-        xmlns="http://www.w3.org/2000/svg"
-        viewBox="0 0 800 400"
-      >
-        {/* Replace with your SVG animation design */}
-        <circle cx="50" cy="50" r="40" fill="lightblue" />
-      </svg>
+                  <option value="">Select Gender</option>
+                  <option value="Male">Male</option>
+                  <option value="Female">Female</option>
+                  <option value="Other">Other</option>
+                </FormControl>
+              </FormGroup>
+              <FormGroup>
+                <FormLabel>Contact No</FormLabel>
+                <FormControl
+                  type="text"
+                  name="contactNo"
+                  value={formData.contactNo}
+                  onChange={handleChange}
+                  required
+                />
+              </FormGroup>
+              <FormGroup>
+                <FormLabel>Source</FormLabel>
+                <FormControl
+                  as="select"
+                  name="source"
+                  value={formData.source}
+                  onChange={handleChange}
+                  required
+                >
+                  <option value="">Select Source</option>
+                  <option value="College">College</option>
+                  <option value="Referral">Referral</option>
+                </FormControl>
+              </FormGroup>
+              {formData.source === "College" && (
+                <FormGroup>
+                  <FormLabel>College Name</FormLabel>
+                  <FormControl
+                    type="text"
+                    name="collegename"
+                    value={formData.collegename}
+                    onChange={handleChange}
+                    required
+                  />
+                </FormGroup>
+              )}
+              {formData.source === "Referral" && (
+                <FormGroup>
+                  <FormLabel>Referral Code</FormLabel>
+                  <FormControl
+                    type="text"
+                    name="referralcode"
+                    value={formData.referralcode}
+                    onChange={handleChange}
+                    required
+                  />
+                </FormGroup>
+              )}
+              <FormGroup>
+                <FormLabel>Qualifications</FormLabel>
+                <FormControl
+                  type="text"
+                  name="qualifications"
+                  value={formData.qualifications}
+                  onChange={handleChange}
+                  required
+                />
+              </FormGroup>
+              <FormGroup>
+                <FormLabel>Stream</FormLabel>
+                <FormControl
+                  type="text"
+                  name="stream"
+                  value={formData.stream}
+                  onChange={handleChange}
+                  required
+                />
+              </FormGroup>
+              <FormGroup>
+                <FormLabel>Year of Passing</FormLabel>
+                <FormControl
+                  type="number"
+                  name="yearOfPassing"
+                  value={formData.yearOfPassing}
+                  onChange={handleChange}
+                  required
+                />
+              </FormGroup>
+            </>
+          )}
+          {isLogin && (
+            <>
+              <FormGroup>
+                <FormLabel>Email</FormLabel>
+                <FormControl
+                  type="email"
+                  name="email"
+                  value={formData.email}
+                  onChange={handleChange}
+                  required
+                />
+              </FormGroup>
+              <FormGroup>
+                <FormLabel>Job Applied For</FormLabel>
+                <FormControl
+                  as="select"
+                  name="jobAppliedFor"
+                  value={formData.jobAppliedFor}
+                  onChange={handleChange}
+                  required
+                >
+                  <option value="">Select a Job</option>
+                  {jobs.length > 0 ? (
+                    jobs.map((job, index) => (
+                      <option key={index} value={job}>
+                        {job}
+                      </option>
+                    ))
+                  ) : (
+                    <option>Loading jobs...</option>
+                  )}
+                </FormControl>
+              </FormGroup>
+            </>
+          )}
+          <Button variant="outline-dark" type="submit" className="my-3">
+            {isLogin ? "Login" : "Register"}
+          </Button>
+        </Form>
+        <Button
+          variant="outline-dark"
+          onClick={() => setIsLogin(!isLogin)}
+          className="my-3"
+        >
+          {isLogin ? "Register" : "Login"}
+        </Button>
+      </Card>
     </div>
   );
 }

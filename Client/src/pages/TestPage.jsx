@@ -1,8 +1,11 @@
+import TestDashboard from "../components/Test/TestDashboard";
 
 function TestPage() {
   return (
-    <div>TestPage</div>
-  )
+    <div className="testpage-wrapper">
+      <TestDashboard />
+    </div>
+  );
 }
 
-export default TestPage
+export default TestPage;

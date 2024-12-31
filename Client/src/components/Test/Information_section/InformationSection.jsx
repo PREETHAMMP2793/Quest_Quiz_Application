@@ -1,80 +1,181 @@
-import "bootstrap/dist/css/bootstrap.min.css";
-import { useState } from "react";
+
+// InformationSection.jsx
+import { useSelector, useDispatch } from "react-redux";
+import { Accordion, Button, ProgressBar, Modal } from "react-bootstrap";
+import {
+  setCurrentQuestion,
+  setTotalPoints,
+  submitTest,
+} from "../../../redux/Slices/testMetaDataSlice";
+import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import axios from "axios";
+import "./InformationSection.css";
 
 const InformationSection = () => {
-  //   const [selectedSection, setSelectedSection] = useState('Aptitude'); // Track selected section
-  const [isSubmitted, setIsSubmitted] = useState(false); // Track submission status
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const [showModal, setShowModal] = useState(false);
+  const [result, setResult] = useState({});
+  const { candidateEmail, questions, currentQuestion, totalPoints } =
+    useSelector((state) => state.testMetaData);
+  const { candidateName, jobAppliedFor } = useSelector(
+    (state) => state.globalData
+  );
 
-  // Define questions under different sections
-  const sections = {
-    Aptitude: [
-      { questionNumber: 1 },
-      { questionNumber: 2 },
-      { questionNumber: 3 },
-    ],
-    Verbal: [
-      { questionNumber: 1 },
-      { questionNumber: 2 },
-      { questionNumber: 3 },
-    ],
+  const compileAnswers = () => {
+    return questions.map((question) => ({
+      questionId: question.questionId,
+      category: question.category,
+      correctOption: question.correctOption,
+      selectedOption: question.selectedOption,
+      timeTaken: question.timeTaken || 0, // Assuming timeTaken is tracked elsewhere
+      point: question.points || 0,
+    }));
   };
-
-  //   const handleSectionChange = (section) => {
-  //     setSelectedSection(section);
-  //     setIsSubmitted(false); // Reset submission status when changing sections
-  //   };
+  const Marks = () => {
+    // Calculate total points based on the current Redux state
+    const total = questions.reduce((sum, question) => {
+      // Ensure `point` is defined and numeric
+      return sum + (question.points || 0);
+    }, 0);
+    // Dispatch the calculated total points to the Redux state
+    dispatch(setTotalPoints(total));
+  };
 
   const handleSubmit = () => {
-    alert("Quiz Submitted!");
-    setIsSubmitted(true);
+    const encodedValue = `${candidateEmail}_${jobAppliedFor}`;
+    const result_Id = encodeURIComponent(encodedValue);
+    dispatch(submitTest());
+    Marks();
+    const compiledAnswers = compileAnswers();
+    const currentResult = {
+      result_Id,
+      candidateName,
+      candidateEmail,
+      jobAppliedFor,
+      answers: compiledAnswers,
+      score: totalPoints,
+    };
+    setResult(currentResult);
+    setShowModal(true);
   };
 
+  const handleConfirmSubmit = async () => {
+    setShowModal(false);
+    try {
+      console.log(result);
+
+      const response = await axios.post(
+        "http://localhost:2000/api/results/add",
+        result
+      );
+      console.log("Result submitted successfully:", response.data);
+    } catch (error) {
+      console.error("Error submitting result:", error);
+    }
+    navigate("/resultpage");
+  };
+
+  const handleCancelSubmit = () => {
+    setShowModal(false); // Close the modal
+  };
+
+  const sections = questions.reduce((acc, question) => {
+    if (!acc[question.category]) {
+      acc[question.category] = [];
+    }
+    acc[question.category].push(question);
+    return acc;
+  }, {});
+
+  const [timeLeft, setTimeLeft] = useState(360); // 6 minutes in seconds
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setTimeLeft((prev) => Math.max(prev - 1, 0));
+    }, 1000);
+    return () => clearInterval(timer);
+  }, []);
+  useEffect(() => {
+    Marks(); // Recalculate total points whenever questions are updated
+  });
+
+  const handleQuestionClick = (questionIndex) => {
+    dispatch(setCurrentQuestion(questionIndex));
+  };
+
+  const progressPercentage = ((360 - timeLeft) / 360) * 100;
+
   return (
-    <div>
-      <h3>Question Info</h3>
-      <p>Additional information about the question goes here.</p>
+    <div className="information-section">
+      <h3>Time remaining</h3>
+      <p>{`${Math.floor(timeLeft / 60)}:${timeLeft % 60}`}</p>
+      <ProgressBar className="progressbar" now={progressPercentage} />
 
-      <div className="accordion" id="accordionExample">
-        {/* Loop through sections and render an accordion for each */}
-        {Object.keys(sections).map((section, sectionIndex) => (
-          <div className="accordion-item" key={sectionIndex}>
-            <h2 className="accordion-header" id={`heading${section}`}>
-              <button
-                className="accordion-button"
-                type="button"
-                data-bs-toggle="collapse"
-                data-bs-target={`collapse${section}`}
-                aria-expanded="true"
-                aria-controls={`collapse${section}`}
-              >
-                {section} {/* Section name (Aptitude, Verbal) */}
-              </button>
-            </h2>
-            <div
-              id={`collapse${section}`}
-              className="accordion-collapse collapse"
-              aria-labelledby={`heading${section}`}
-              data-bs-parent="#accordionExample"
-            >
-              <div className="accordion-body">
-                {/* Loop through questions for this section */}
-                {sections[section].map((question, questionIndex) => (
-                  <p key={questionIndex}>Question {question.questionNumber}</p>
-                ))}
-              </div>
-            </div>
-          </div>
-        ))}
-      </div>
-
-      {/* Submit button for the entire quiz */}
-      {!isSubmitted && (
-        <button className="btn btn-success m-2" onClick={handleSubmit}>
-          Submit
-        </button>
-      )}
-
-      {isSubmitted && <p>Thank you for submitting!</p>}
+      <Accordion className="accordion" defaultActiveKey="0">
+        {Object.entries(sections).map(
+          ([category, categoryQuestions], sectionIndex) => (
+            <Accordion.Item eventKey={String(sectionIndex)} key={category}>
+              <Accordion.Header>{category} Questions</Accordion.Header>
+              <Accordion.Body>
+                <div className="question-buttons">
+                  {categoryQuestions.map((question, index) => {
+                    const isCurrent =
+                      questions[currentQuestion].questionId ===
+                      question.questionId;
+                    return (
+                      <Button
+                        key={question.questionId}
+                        className="question-button"
+                        onClick={() =>
+                          handleQuestionClick(
+                            questions.findIndex(
+                              (q) => q.questionId === question.questionId
+                            )
+                          )
+                        }
+                        style={{
+                          color: "black",
+                          backgroundColor: isCurrent ? "red" : "white",
+                          borderColor: "black",
+                        }}
+                      >
+                        {index + 1}
+                      </Button>
+                    );
+                  })}
+                </div>
+              </Accordion.Body>
+            </Accordion.Item>
+          )
+        )}
+      </Accordion>
+      <Button
+        className="submit-button
+      "
+        variant="outline-dark"
+        onClick={handleSubmit}
+      >
+        Submit
+      </Button>
+      <Modal show={showModal} onHide={handleCancelSubmit}>
+        <Modal.Header closeButton>
+          <Modal.Title>Confirm Submit</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          Are you sure you want to submit the test? Once submitted, changes
+          cannot be made.
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={handleCancelSubmit}>
+            Cancel
+          </Button>
+          <Button variant="primary" onClick={handleConfirmSubmit}>
+            Confirm Submit
+          </Button>
+        </Modal.Footer>
+      </Modal>
     </div>
   );
 };

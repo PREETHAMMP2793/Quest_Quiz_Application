@@ -6,11 +6,12 @@ const {
     deleteQuestion,
     getQuestionByCategory,
     getQuestionByJob,
-    getAllQuestions
+    getAllQuestions,
+    getDistinctJobPositions
 } = require('../controllers/QuestionController');
 
 // Route to create a new question
-router.post('/questions', createQuestion);
+router.post('/question', createQuestion);
 
 // Route to edit an existing question by ID
 router.put('/questions/:questionId', editQuestion);
@@ -26,5 +27,7 @@ router.get('/questions/job/:jobAppliedFor', getQuestionByJob);
 
 // Route to get all questions
 router.get('/questions', getAllQuestions);
+
+router.get('/jobs', getDistinctJobPositions);
 
 module.exports = router;

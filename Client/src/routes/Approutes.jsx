@@ -1,24 +1,25 @@
-import {Routes, Route } from "react-router"
-import LandingPage from "../pages/LandingPage"
-import AdminLogin from "../pages/AdminLoginPage"
-import CandidateLogin from "../pages/CandidateLoginPage"
-import AdminPage from "../pages/AdminPage"
+import "react-router-dom";
+import { Routes, Route } from "react-router-dom";
+import LandingPage from "../pages/LandingPage";
+import CandidateLogin from "../pages/CandidateLoginPage";
+import AdminLogin from "../pages/AdminLoginPage";
 import TestPage from "../pages/TestPage";
 import ResultPage from "../pages/ResultPage";
+import AdminPage from "../pages/AdminPage";
 
-function Approutes() {
+function AppRoutes() {
   return (
     <div>
-        <Routes>
-            <Route path="/" element={<LandingPage />} />
-            <Route path="/adminLogin" element={<AdminLogin />} />
-            <Route path="/candidateLogin" element={<CandidateLogin />} />
-            <Route path="/testpage" element={<TestPage />}></Route>
-            <Route path="/adminpage" element={<AdminPage/>}/>
-            <Route path="/resultpage" element={<ResultPage />}></Route>
-        </Routes>
+      <Routes>
+        <Route path="/" element={<LandingPage />}></Route>
+        <Route path="/adminlogin" element={<AdminLogin />}></Route>
+        <Route path="/candidatelogin" element={<CandidateLogin />}></Route>
+        <Route path="/testpage" element={<TestPage />}></Route>
+        <Route path="/adminpage" element={<AdminPage />}></Route>
+        <Route path="/resultpage" element={<ResultPage />}></Route>
+      </Routes>
     </div>
-  )
+  );
 }
 
-export default Approutes
+export default AppRoutes;

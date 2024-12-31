@@ -1,3 +1,4 @@
+
 import { Row, Col } from "react-bootstrap";
 import "./TestDashboard.css";
 import Questions from "./Questions/Questions";
@@ -7,36 +8,31 @@ import { useEffect } from "react";
 import {
   setQuestions,
   setCandidateEmail,
-} from "../../redux/Slices/testMetaDataSlice"; // Import Redux actions
+} from "../../redux/Slices/testMetaDataSlice";
 
 const TestDashboard = () => {
   const dispatch = useDispatch();
 
-  // Fetch candidate info from global state
-  const { candidateName, candidateEmail, jobAppliedFor } = useSelector(
+  const { candidateEmail, jobAppliedFor } = useSelector(
     (state) => state.globalData
   );
-  console.log(jobAppliedFor);
 
   useEffect(() => {
     if (jobAppliedFor && candidateEmail) {
       const encodedValue = encodeURIComponent(jobAppliedFor);
-      // Fetch questions based on jobAppliedFor
       fetch(`http://localhost:2000/api/questions/questions/job/${encodedValue}`)
-        .then((response) => response.json()) // Parse the response as JSON
+        .then((response) => response.json())
         .then((data) => {
-          console.log("Fetched questions:", data); // Log the response data
-
           if (Array.isArray(data)) {
             const questions = data.map((question) => ({
               ...question,
-              selectedOption: null, // Initially no option is selected
-              visited: false, // Initially, the question hasn't been visited
-              points: 0, // Default points, can be changed if needed
+              selectedOption: null,
+              visited: false,
+              points: 0,
             }));
-
-            // Dispatch questions to Redux
             dispatch(setQuestions(questions));
+            console.log(candidateEmail);
+
             dispatch(setCandidateEmail(candidateEmail));
           } else {
             console.error("Response data is not an array:", data);
@@ -50,29 +46,20 @@ const TestDashboard = () => {
 
   return (
     <div className="test-dashboard-container">
-      {/* Header */}
       <header className="test-dashboard-header">
         <h1>Test Page</h1>
+        <p>{candidateEmail}</p>
       </header>
-
-      {/* Main Content */}
       <main className="test-dashboard-main">
         <Row className="test-dashboard-row">
           <Col md={7} className="test-dashboard-questions">
             <Questions />
           </Col>
-
           <Col md={5} className="test-dashboard-info">
-            <InformationSection
-              candidateName={candidateName}
-              candidateEmail={candidateEmail}
-              jobAppliedFor={jobAppliedFor}
-            />
+            <InformationSection />
           </Col>
         </Row>
       </main>
-
-      {/* Footer */}
       <footer className="test-dashboard-footer">
         <p>© 2024 Test Page. All Rights Reserved.</p>
       </footer>

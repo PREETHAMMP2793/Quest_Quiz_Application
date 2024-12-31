@@ -1,31 +1,28 @@
+
 const Result = require("../models/ResultModel"); // Adjust the path to your model as needed
 
 // Controller function to add a result
 const addResult = async (req, res) => {
     try {
         // Extract result data from the request body
+
         const {
-            userid,
-            testid,
-            date,
+            result_Id,
+            candidateName,
+            candidateEmail,
+            jobAppliedFor,
             answers,
             score
         } = req.body;
-
-        // Validate required fields
-        if (!userid || !testid || !date || !answers) {
-            return res.status(400).json({ message: "Missing required fields." });
-        }
-
         // Generate resultid as a combination of userid and testid
-        const resultid = `${userid}_${testid}`;
+        const resultid = `${result_Id}`;
 
         // Create a new Result document
         const newResult = new Result({
             resultid,
-            userid,
-            testid,
-            date,
+            candidateName,
+            candidateEmail,
+            jobAppliedFor,
             answers,
             score
         });
@@ -44,12 +41,12 @@ const addResult = async (req, res) => {
 // Fetch results by filters (dynamic query)
 const getResults = async (req, res) => {
     try {
-        const { userid, testid, date, score } = req.query;
+        const { candidateEmail, jobAppliedFor, date, score } = req.query;
 
         // Create dynamic query object
         const query = {};
-        if (userid) query.userid = userid;
-        if (testid) query.testid = testid;
+        if (candidateEmail) query.candidateEmail = candidateEmail;
+        if (jobAppliedFor) query.jobAppliedFor = jobAppliedFor;
         if (date) query.date = date;
         if (score) query.score = parseInt(score, 10); // Convert score to integer
 
@@ -63,9 +60,9 @@ const getResults = async (req, res) => {
 // Fetch a single result by resultid
 const getResultById = async (req, res) => {
     try {
-        const { resultid } = req.params;
-
-        const result = await Result.findOne({ resultid });
+        const { result_id } = req.params;
+        console.log(result_id);
+        const result = await Result.findOne({ result_id });
         if (!result) {
             return res.status(404).json({ message: "Result not found" });
         }
