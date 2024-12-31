@@ -2,7 +2,7 @@ import Admin from "../components/Login/Admin/Admin"
 
 function AdminLogin() {
   return (
-    <div>AdminLogin
+    <div>
       <Admin/>
     </div>
   )
